@@ -1,7 +1,7 @@
 // Compound Components
 
 import React from 'react'
-import {Switch} from '../switch'
+import { Switch } from '../switch'
 
 class Toggle extends React.Component {
   // you can create function components as static properties!
@@ -11,15 +11,20 @@ class Toggle extends React.Component {
   // This is handy because it makes the relationship between the
   // parent Toggle component and the child Candy component more explicit
   // 🐨 You'll need to create three such components here: On, Off, and Button
+  static On = ({ on, children }) => (on ? children : null)
+  static Off = ({ on, children }) => (on ? null : children)
+  static Button = ({ on, toggle, ...props }) => (
+    <Switch on={on} onClick={toggle} {...props} />
+  )
   //    The button will be responsible for rendering the <Switch /> (with the right props)
   // 💰 Combined with changes you'll make in the `render` method, these should
   //    be able to accept `on`, `toggle`, and `children` as props.
   //    Note that they will _not_ have access to Toggle instance properties
   //    like `this.state.on` or `this.toggle`.
-  state = {on: false}
+  state = { on: false }
   toggle = () =>
     this.setState(
-      ({on}) => ({on: !on}),
+      ({ on }) => ({ on: !on }),
       () => this.props.onToggle(this.state.on),
     )
   render() {
@@ -31,10 +36,14 @@ class Toggle extends React.Component {
     // To do this, you can use:
     // 1. React.Children.map: https://reactjs.org/docs/react-api.html#reactchildrenmap
     // 2. React.cloneElement: https://reactjs.org/docs/react-api.html#cloneelement
-    //
+    return React.Children.map(this.props.children, child =>
+      React.cloneElement(child, {
+        on: this.state.on,
+        toggle: this.toggle,
+      }),
+    )
     // 🐨 you'll want to completely replace the code below with the above logic.
-    const {on} = this.state
-    return <Switch on={on} onClick={this.toggle} />
+
   }
 }
 
@@ -57,4 +66,4 @@ function Usage({
 }
 Usage.title = 'Compound Components'
 
-export {Toggle, Usage as default}
+export { Toggle, Usage as default }
